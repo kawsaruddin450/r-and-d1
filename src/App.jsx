@@ -95,7 +95,7 @@ const App = () => {
                 <div
                     style={{
                         position: 'absolute',
-                        top: selectedComment.position.y,
+                        top: selectedComment.position.y,           
                         left: selectedComment.position.x,
                         transform: 'translate(-50%, -50%)',
                         padding: '20px',
