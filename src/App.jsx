@@ -80,6 +80,7 @@ const App = () => {
                             onChange={(e) => setNewComment(e.target.value)}
                             placeholder="Add your comment"></textarea>
                         <input type='submit' value={"Post"} />
+                        <button onClick={() => setShowModal(false)}>Close</button>
                     </form>
                     {/* <textarea
             value={newComment}
