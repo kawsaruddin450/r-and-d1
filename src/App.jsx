@@ -6,6 +6,7 @@ const App = () => {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [selectedComment, setSelectedComment] = useState(null);
+    const [giveFeedback, setGiveFeedback] = useState(false);
 
     const handlePageClick = (e) => {
         const { pageX, pageY } = e;
@@ -28,14 +29,28 @@ const App = () => {
     };
 
     return (
-        <div onClick={handlePageClick} style={{ height: '100vh', cursor: 'pointer' }}>
-            <h1>Click anywhere to leave a comment!</h1>
-            <br /> <br />
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus, quam error? Hic vitae rem iusto voluptatem consequuntur quasi et animi, laudantium ab libero facere veritatis pariatur blanditiis totam voluptates quod nam vero! Consectetur commodi doloremque quo? Quae illo a hic! Harum incidunt molestias repellendus esse libero cumque architecto deleniti? In impedit laudantium dolore error ipsum soluta eligendi pariatur alias nulla reiciendis enim, ex dignissimos. Officia eos voluptates expedita? Aut minima quis officiis. Molestiae itaque voluptas at dignissimos. Molestias molestiae tenetur veritatis, harum tempore voluptate quasi qui, architecto, sit optio dolor inventore? Distinctio tempora hic veritatis consectetur id consequuntur adipisci doloremque.</p>
-            <br /><br />
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maiores necessitatibus doloremque adipisci. Accusantium perspiciatis quisquam repudiandae dolorem ducimus libero! Voluptatum tempore repellendus laboriosam enim voluptas optio vitae provident eos iste? Voluptate earum enim sed culpa ab veritatis ea omnis. Perferendis autem minus dolor quas pariatur alias, explicabo ea, nostrum voluptatem culpa tenetur temporibus. Quod, nulla accusantium quidem, molestias maiores perspiciatis dolor iure voluptates deserunt quo id, nesciunt reprehenderit ratione esse et! Totam voluptatem vel nesciunt maiores. Magnam impedit minima dolorum omnis iusto quam minus! Assumenda perspiciatis dolore deserunt nesciunt repellendus natus nihil itaque veniam modi, ullam provident distinctio ipsum.</p>
-            <br /><br />
-            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Pariatur distinctio, animi quisquam labore dolor vero odio eos vel quia quasi tenetur impedit? Maiores impedit numquam aperiam dicta magni delectus ea consequuntur incidunt sint, error ratione natus repudiandae eaque quam est inventore debitis? Amet fugit nesciunt omnis aperiam nihil, necessitatibus itaque quisquam quas nisi est quod aliquam similique delectus rem voluptatem nemo, eius odit, aut soluta ut id. Accusantium officia, corporis officiis ducimus exercitationem ipsa! Quo nobis alias quae dolores hic officia eum ut consectetur. Natus exercitationem ducimus quae sunt consequuntur at, blanditiis iste et omnis amet sint in porro quam?</p>
+        <div style={{ height: '100vh', cursor: 'pointer' }}>
+            <div onClick={giveFeedback ? handlePageClick : null}>
+                <h1>Click anywhere to leave a comment!</h1>
+                <br /> <br />
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus, quam error? Hic vitae rem iusto voluptatem consequuntur quasi et animi, laudantium ab libero facere veritatis pariatur blanditiis totam voluptates quod nam vero! Consectetur commodi doloremque quo? Quae illo a hic! Harum incidunt molestias repellendus esse libero cumque architecto deleniti? In impedit laudantium dolore error ipsum soluta eligendi pariatur alias nulla reiciendis enim, ex dignissimos. Officia eos voluptates expedita? Aut minima quis officiis. Molestiae itaque voluptas at dignissimos. Molestias molestiae tenetur veritatis, harum tempore voluptate quasi qui, architecto, sit optio dolor inventore? Distinctio tempora hic veritatis consectetur id consequuntur adipisci doloremque.</p>
+                <br /><br />
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maiores necessitatibus doloremque adipisci. Accusantium perspiciatis quisquam repudiandae dolorem ducimus libero! Voluptatum tempore repellendus laboriosam enim voluptas optio vitae provident eos iste? Voluptate earum enim sed culpa ab veritatis ea omnis. Perferendis autem minus dolor quas pariatur alias, explicabo ea, nostrum voluptatem culpa tenetur temporibus. Quod, nulla accusantium quidem, molestias maiores perspiciatis dolor iure voluptates deserunt quo id, nesciunt reprehenderit ratione esse et! Totam voluptatem vel nesciunt maiores. Magnam impedit minima dolorum omnis iusto quam minus! Assumenda perspiciatis dolore deserunt nesciunt repellendus natus nihil itaque veniam modi, ullam provident distinctio ipsum.</p>
+                <br /><br />
+                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Pariatur distinctio, animi quisquam labore dolor vero odio eos vel quia quasi tenetur impedit? Maiores impedit numquam aperiam dicta magni delectus ea consequuntur incidunt sint, error ratione natus repudiandae eaque quam est inventore debitis? Amet fugit nesciunt omnis aperiam nihil, necessitatibus itaque quisquam quas nisi est quod aliquam similique delectus rem voluptatem nemo, eius odit, aut soluta ut id. Accusantium officia, corporis officiis ducimus exercitationem ipsa! Quo nobis alias quae dolores hic officia eum ut consectetur. Natus exercitationem ducimus quae sunt consequuntur at, blanditiis iste et omnis amet sint in porro quam?</p>
+            </div>
+
+
+            {/* Button to activate comment */}
+            <button
+                style={{
+                    position: 'fixed',
+                    bottom: '10px',
+                    right: '10px',
+                    fontWeight: `${giveFeedback? 'normal' : 'bold'}`
+                }}
+                onClick={() => setGiveFeedback(!giveFeedback)}
+            >Feedback</button>
 
             {/* Markers for each comment */}
             {comments.map((comment) => (
@@ -82,12 +97,7 @@ const App = () => {
                         <input type='submit' value={"Post"} />
                         <button onClick={() => setShowModal(false)}>Close</button>
                     </form>
-                    {/* <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Add your comment"
-          />
-          <button onClick={handleCommentSubmit}>Submit</button> */}
+
                 </div>
             )}
 
@@ -96,7 +106,7 @@ const App = () => {
                 <div
                     style={{
                         position: 'absolute',
-                        top: selectedComment.position.y,           
+                        top: selectedComment.position.y,
                         left: selectedComment.position.x,
                         transform: 'translate(-50%, -50%)',
                         padding: '20px',
