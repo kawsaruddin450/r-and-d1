@@ -15,7 +15,7 @@ const App = () => {
     };
 
     const handleCommentSubmit = () => {
-        setComments([...comments, { id: Date.now(), text: newComment, position: modalPosition }]);
+        setComments([...comments, { id: Date.now(), text: newComment, position: modalPosition, completed: false }]);
         setNewComment('');
         setShowModal(false);
     };
@@ -27,6 +27,10 @@ const App = () => {
     const closeCommentPopup = () => {
         setSelectedComment(null);
     };
+
+    const setCompleted = (comment)=> {
+        comment.completed = true;
+    }
 
     return (
         <div style={{ height: '100vh', cursor: 'pointer' }}>
@@ -62,12 +66,12 @@ const App = () => {
                         left: comment.position.x,
                         width: '20px',
                         height: '20px',
-                        backgroundColor: 'red',
+                        backgroundColor: `${comment.completed ? 'green' : 'red'}`,
                         borderRadius: '50%',
                         cursor: 'pointer',
                         transform: 'translate(-50%, -50%)',
                     }}
-                    onClick={(e) => {
+                    onMouseEnter={(e) => {
                         e.stopPropagation();
                         handleMarkerClick(comment);
                     }}
@@ -118,6 +122,7 @@ const App = () => {
                 >
                     <p>{selectedComment.text}</p>
                     <button onClick={closeCommentPopup}>Close</button>
+                    {selectedComment.completed || <button onClick={()=> setCompleted(selectedComment)}>Complete</button>}
                 </div>
             )}
         </div>
