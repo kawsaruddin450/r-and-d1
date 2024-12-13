@@ -47,10 +47,10 @@ const App = () => {
                     position: 'fixed',
                     bottom: '10px',
                     right: '10px',
-                    fontWeight: `${giveFeedback? 'normal' : 'bold'}`
+                    fontWeight: `${giveFeedback? 'bold' : 'normal'}`
                 }}
                 onClick={() => setGiveFeedback(!giveFeedback)}
-            >Feedback</button>
+            >{`${giveFeedback? 'Deactivate' : 'Activate'}`}</button>
 
             {/* Markers for each comment */}
             {comments.map((comment) => (
