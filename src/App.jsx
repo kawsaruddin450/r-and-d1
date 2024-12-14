@@ -5,8 +5,10 @@ const App = () => {
     const [showModal, setShowModal] = useState(false);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
+    const [newReply, setNewReply] = useState('');
     const [selectedComment, setSelectedComment] = useState(null);
     const [giveFeedback, setGiveFeedback] = useState(false);
+    const [giveReply, setGiveReply] = useState(false);
 
     const handlePageClick = (e) => {
         const { pageX, pageY } = e;
@@ -15,22 +17,29 @@ const App = () => {
     };
 
     const handleCommentSubmit = () => {
-        setComments([...comments, { id: Date.now(), text: newComment, position: modalPosition, completed: false }]);
+        setComments([...comments, { id: Date.now(), text: newComment, position: modalPosition, completed: false, replies: [] }]);
         setNewComment('');
         setShowModal(false);
     };
+
+    const handleReplySubmit = (comment) => {
+        comment.replies = [...comment.replies, {id: Date.now(), text: newReply}]
+        setNewReply('');
+        closeCommentPopup();
+    }
 
     const handleMarkerClick = (comment) => {
         setSelectedComment(comment);
     };
 
+
     const closeCommentPopup = () => {
         setSelectedComment(null);
     };
 
-    const setCompleted = (comment)=> {
+    const setCompleted = (comment) => {
         comment.completed = true;
-    }
+    };
 
     return (
         <div style={{ height: '100vh', cursor: 'pointer' }}>
@@ -51,10 +60,10 @@ const App = () => {
                     position: 'fixed',
                     bottom: '10px',
                     right: '10px',
-                    fontWeight: `${giveFeedback? 'bold' : 'normal'}`
+                    fontWeight: `${giveFeedback ? 'bold' : 'normal'}`
                 }}
                 onClick={() => setGiveFeedback(!giveFeedback)}
-            >{`${giveFeedback? 'Deactivate' : 'Activate'}`}</button>
+            >{`${giveFeedback ? 'Deactivate' : 'Activate'}`}</button>
 
             {/* Markers for each comment */}
             {comments.map((comment) => (
@@ -121,8 +130,26 @@ const App = () => {
                     }}
                 >
                     <p>{selectedComment.text}</p>
+                    <h4>Replies: </h4>
+                    {
+                        selectedComment.replies.map(reply => (
+                            <div key={reply.id}>
+                                <p>{reply.text}</p>
+                            </div>
+                        ))
+                    }
+                    {
+                        giveReply && <form onSubmit={()=> handleReplySubmit(selectedComment)}>
+                            <label htmlFor="comment">Put your reply here: </label>
+                            <textarea name="reply" id="reply" rows={5} value={newReply}
+                                onChange={(e) => setNewReply(e.target.value)}
+                                placeholder="Add your reply"></textarea>
+                            <input type='submit' value={"Post"} />
+                        </form>
+                    }
+                    {(selectedComment.completed || giveReply) || <button onClick={() => setGiveReply(true)}>Reply</button>}
                     <button onClick={closeCommentPopup}>Close</button>
-                    {selectedComment.completed || <button onClick={()=> setCompleted(selectedComment)}>Complete</button>}
+                    {selectedComment.completed || <button onClick={() => setCompleted(selectedComment)}>Complete</button>}
                 </div>
             )}
         </div>
