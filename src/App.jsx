@@ -10,10 +10,36 @@ const App = () => {
     const [giveFeedback, setGiveFeedback] = useState(false);
     const [giveReply, setGiveReply] = useState(false);
 
-    const handlePageClick = (e) => {
-        const { pageX, pageY } = e;
-        setModalPosition({ x: pageX, y: pageY });
-        setShowModal(true);
+    // Function to generate XPath
+    const getXPath = (element) => {
+        if (element.id) {
+            return `//*[@id="${element.id}"]`;
+        }
+        if (element === document.body) {
+            return "/html/body";
+        }
+        let index = 1;
+        let siblings = element.parentNode ? element.parentNode.childNodes : [];
+        for (let sibling of siblings) {
+            if (sibling === element) break;
+            if (sibling.nodeType === 1 && sibling.nodeName === element.nodeName) {
+                index++;
+            }
+        }
+        const tagName = element.nodeName.toLowerCase();
+        return (
+            getXPath(element.parentNode) +
+            "/" +
+            tagName +
+            (index > 1 ? `[${index}]` : "")
+        );
+    };
+
+    // onClick handler for the container
+    const handleClick = (event) => {
+        const clickedElement = event.target;
+        const relativeXPath = getXPath(clickedElement);
+        console.log("Clicked element's XPath:", relativeXPath);
     };
 
     const handleCommentSubmit = () => {
@@ -23,7 +49,7 @@ const App = () => {
     };
 
     const handleReplySubmit = (comment) => {
-        comment.replies = [...comment.replies, {id: Date.now(), text: newReply}]
+        comment.replies = [...comment.replies, { id: Date.now(), text: newReply }]
         setNewReply('');
         closeCommentPopup();
     }
@@ -42,15 +68,31 @@ const App = () => {
     };
 
     return (
-        <div style={{ height: '100vh', cursor: 'pointer' }}>
-            <div onClick={giveFeedback ? handlePageClick : null}>
+        <div onClick={giveFeedback ? handleClick : null} style={{ height: '100vh', cursor: 'pointer' }}>
+            <div>
                 <h1>Click anywhere to leave a comment!</h1>
                 <br /> <br />
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Delectus, quam error? Hic vitae rem iusto voluptatem consequuntur quasi et animi, laudantium ab libero facere veritatis pariatur blanditiis totam voluptates quod nam vero! Consectetur commodi doloremque quo? Quae illo a hic! Harum incidunt molestias repellendus esse libero cumque architecto deleniti? In impedit laudantium dolore error ipsum soluta eligendi pariatur alias nulla reiciendis enim, ex dignissimos. Officia eos voluptates expedita? Aut minima quis officiis. Molestiae itaque voluptas at dignissimos. Molestias molestiae tenetur veritatis, harum tempore voluptate quasi qui, architecto, sit optio dolor inventore? Distinctio tempora hic veritatis consectetur id consequuntur adipisci doloremque.</p>
-                <br /><br />
-                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolor maiores necessitatibus doloremque adipisci. Accusantium perspiciatis quisquam repudiandae dolorem ducimus libero! Voluptatum tempore repellendus laboriosam enim voluptas optio vitae provident eos iste? Voluptate earum enim sed culpa ab veritatis ea omnis. Perferendis autem minus dolor quas pariatur alias, explicabo ea, nostrum voluptatem culpa tenetur temporibus. Quod, nulla accusantium quidem, molestias maiores perspiciatis dolor iure voluptates deserunt quo id, nesciunt reprehenderit ratione esse et! Totam voluptatem vel nesciunt maiores. Magnam impedit minima dolorum omnis iusto quam minus! Assumenda perspiciatis dolore deserunt nesciunt repellendus natus nihil itaque veniam modi, ullam provident distinctio ipsum.</p>
-                <br /><br />
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Pariatur distinctio, animi quisquam labore dolor vero odio eos vel quia quasi tenetur impedit? Maiores impedit numquam aperiam dicta magni delectus ea consequuntur incidunt sint, error ratione natus repudiandae eaque quam est inventore debitis? Amet fugit nesciunt omnis aperiam nihil, necessitatibus itaque quisquam quas nisi est quod aliquam similique delectus rem voluptatem nemo, eius odit, aut soluta ut id. Accusantium officia, corporis officiis ducimus exercitationem ipsa! Quo nobis alias quae dolores hic officia eum ut consectetur. Natus exercitationem ducimus quae sunt consequuntur at, blanditiis iste et omnis amet sint in porro quam?</p>
+                <h2>This is a heading 2</h2>
+                <h3>This is a heading 3</h3>
+                <h4>This is a heading 4</h4>
+                <h5>This is a heading 5</h5>
+
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque laboriosam dicta quaerat quod totam excepturi nesciunt asperiores quis quas nam.</p>
+                <br />
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. At voluptates nisi cumque assumenda voluptatum deleniti voluptate eligendi saepe voluptatibus! Vero.</p>
+                <br />
+                <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Corrupti error aliquid nostrum? Ipsam recusandae quis sequi. Ipsum quidem maiores aliquam.</p>
+                <br />
+                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Nostrum cum, perspiciatis fuga rem id blanditiis! Culpa perferendis itaque laudantium beatae!</p>
+                <br />
+                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Adipisci et laborum magnam tempora nulla ex facilis porro ab doloribus corporis!</p>
+                <br />
+                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Et voluptatum quasi ex consequuntur voluptatibus tenetur similique fuga impedit voluptatem omnis.</p>
+                <br />
+                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit. Ratione, nostrum eos suscipit voluptate illo quas! Dolores eos magni sit necessitatibus!</p>
+
+
+
             </div>
 
 
@@ -139,7 +181,7 @@ const App = () => {
                         ))
                     }
                     {
-                        giveReply && <form onSubmit={()=> handleReplySubmit(selectedComment)}>
+                        giveReply && <form onSubmit={() => handleReplySubmit(selectedComment)}>
                             <label htmlFor="comment">Put your reply here: </label>
                             <textarea name="reply" id="reply" rows={5} value={newReply}
                                 onChange={(e) => setNewReply(e.target.value)}
