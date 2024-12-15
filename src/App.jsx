@@ -1,4 +1,8 @@
 import { useState } from 'react';
+import image1 from '../public/images/image1.jpg';
+import image2 from '../public/images/image2.jpg';
+import image3 from '../public/images/image3.jpg';
+import image4 from '../public/images/image4.jpg';
 
 const App = () => {
     const [modal, setModal] = useState({
@@ -38,6 +42,26 @@ const App = () => {
         );
     };
 
+    // Get element position using XPath
+    const getElementPosition = (xpath) => {
+        const element = document.evaluate(
+            xpath,
+            document,
+            null,
+            XPathResult.FIRST_ORDERED_NODE_TYPE,
+            null
+        ).singleNodeValue;
+
+        if (element) {
+            const rect = element.getBoundingClientRect();
+            return {
+                x: rect.left + window.scrollX + rect.width / 2,
+                y: rect.top + window.scrollY + rect.height / 2,
+            };
+        }
+        return null;
+    };
+
     // onClick handler for the container
     const handleClick = (event) => {
         const clickedElement = event.target;
@@ -50,8 +74,8 @@ const App = () => {
         // Update state to show modal at the clicked location
         setModal({
             isVisible: true,
-            x: rect.left + window.scrollX + rect.width/2,
-            y: rect.top + window.scrollY + rect.height/2,
+            x: rect.left + window.scrollX + rect.width / 2,
+            y: rect.top + window.scrollY + rect.height / 2,
             xpath: relativeXPath,
         });
     };
@@ -67,7 +91,7 @@ const App = () => {
     };
 
     const handleCommentSubmit = () => {
-        setComments([...comments, { id: Date.now(), text: newComment, xpath: modal.xpath, x:modal.x, y:modal.y, completed: false, giveReply: false, replies: [] }]);
+        setComments([...comments, { id: Date.now(), text: newComment, xpath: modal.xpath, completed: false, giveReply: false, replies: [] }]);
         setNewComment('');
         closeModal();
     };
@@ -97,7 +121,7 @@ const App = () => {
     };
 
     return (
-        <div onClick={giveFeedback ? handleClick : null} style={{ height: '100vh', cursor: 'pointer' }}>
+        <div onClick={giveFeedback ? handleClick : null} style={{ height: '100vh', width: '100vw', cursor: 'pointer' }}>
             <div>
                 <h1>Click anywhere to leave a comment!</h1>
                 <br /> <br />
@@ -105,6 +129,11 @@ const App = () => {
                 <h3>This is a heading 3</h3>
                 <h4>This is a heading 4</h4>
                 <h5>This is a heading 5</h5>
+
+                <img src={image1} width={500} alt="" />
+                <img src={image2} width={500} alt="" />
+                <img src={image3} width={500} alt="" />
+                <img src={image4} width={500} alt="" />
 
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque laboriosam dicta quaerat quod totam excepturi nesciunt asperiores quis quas nam.</p>
                 <br />
@@ -137,39 +166,44 @@ const App = () => {
             >{`${giveFeedback ? 'Deactivate' : 'Activate'}`}</button>
 
             {/* Markers for each comment */}
-            {comments.map((comment) => (
-                <div
-                    key={comment.id}
-                    style={{
-                        position: 'absolute',
-                        top: comment.y,
-                        left: comment.x,
-                        width: '20px',
-                        height: '20px',
-                        backgroundColor: `${comment.completed ? 'green' : 'red'}`,
-                        borderRadius: '50%',
-                        cursor: 'pointer',
-                        transform: 'translate(-50%, -50%)',
-                    }}
-                    onMouseEnter={(e) => {
-                        e.stopPropagation();
-                        handleMarkerClick(comment);
-                    }}
-                />
-            ))}
+            {giveFeedback && comments.map((comment) => {
+                const position = getElementPosition(comment.xpath);
+                return (
+                    <div
+                        key={comment.id}
+                        style={{
+                            position: 'absolute',
+                            top: position.y,
+                            left: position.x,
+                            width: '20px',
+                            height: '20px',
+                            backgroundColor: `${comment.completed ? 'green' : 'red'}`,
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            transform: 'translate(-50%, -50%)',
+                        }}
+                        onMouseEnter={(e) => {
+                            e.stopPropagation();
+                            handleMarkerClick(comment);
+                        }}
+                    ></div>
+                )
+            }
+
+            )}
 
             {/* Modal for adding a new comment */}
             {modal.isVisible && (
                 <div
-                style={{
-                    position: "absolute",
-                    top: modal.y,
-                    left: modal.x,
-                    backgroundColor: "white",
-                    border: "1px solid black",
-                    padding: "10px",
-                    zIndex: 1000,
-                  }}
+                    style={{
+                        position: "absolute",
+                        top: modal.y,
+                        left: modal.x,
+                        backgroundColor: "white",
+                        border: "1px solid black",
+                        padding: "10px",
+                        zIndex: 1000,
+                    }}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <form onSubmit={handleCommentSubmit}>
