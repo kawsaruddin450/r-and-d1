@@ -1,14 +1,17 @@
 import { useState } from 'react';
 
 const App = () => {
-    const [modalPosition, setModalPosition] = useState({ x: 0, y: 0 });
-    const [showModal, setShowModal] = useState(false);
+    const [modal, setModal] = useState({
+        isVisible: false,
+        x: 0,
+        y: 0,
+        xpath: "",
+    });
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [newReply, setNewReply] = useState('');
     const [selectedComment, setSelectedComment] = useState(null);
     const [giveFeedback, setGiveFeedback] = useState(false);
-    const [giveReply, setGiveReply] = useState(false);
 
     // Function to generate XPath
     const getXPath = (element) => {
@@ -40,18 +43,44 @@ const App = () => {
         const clickedElement = event.target;
         const relativeXPath = getXPath(clickedElement);
         console.log("Clicked element's XPath:", relativeXPath);
+
+        // Get position of the clicked element
+        const rect = clickedElement.getBoundingClientRect();
+
+        // Update state to show modal at the clicked location
+        setModal({
+            isVisible: true,
+            x: rect.left + window.scrollX + rect.width/2,
+            y: rect.top + window.scrollY + rect.height/2,
+            xpath: relativeXPath,
+        });
+    };
+
+    // Close modal
+    const closeModal = () => {
+        setModal({
+            isVisible: false,
+            x: 0,
+            y: 0,
+            xpath: "",
+        });
     };
 
     const handleCommentSubmit = () => {
-        setComments([...comments, { id: Date.now(), text: newComment, position: modalPosition, completed: false, replies: [] }]);
+        setComments([...comments, { id: Date.now(), text: newComment, xpath: modal.xpath, x:modal.x, y:modal.y, completed: false, giveReply: false, replies: [] }]);
         setNewComment('');
-        setShowModal(false);
+        closeModal();
     };
+
+    const activateReply = (comment) => {
+        comment.giveReply = true;
+    }
 
     const handleReplySubmit = (comment) => {
         comment.replies = [...comment.replies, { id: Date.now(), text: newReply }]
         setNewReply('');
         closeCommentPopup();
+        comment.giveReply = false;
     }
 
     const handleMarkerClick = (comment) => {
@@ -113,8 +142,8 @@ const App = () => {
                     key={comment.id}
                     style={{
                         position: 'absolute',
-                        top: comment.position.y,
-                        left: comment.position.x,
+                        top: comment.y,
+                        left: comment.x,
                         width: '20px',
                         height: '20px',
                         backgroundColor: `${comment.completed ? 'green' : 'red'}`,
@@ -130,18 +159,17 @@ const App = () => {
             ))}
 
             {/* Modal for adding a new comment */}
-            {showModal && (
+            {modal.isVisible && (
                 <div
-                    style={{
-                        position: 'absolute',
-                        top: modalPosition.y,
-                        left: modalPosition.x,
-                        transform: 'translate(-50%, -50%)',
-                        padding: '20px',
-                        backgroundColor: 'white',
-                        boxShadow: '0px 4px 8px rgba(0, 0, 0, 0.2)',
-                        zIndex: 1000
-                    }}
+                style={{
+                    position: "absolute",
+                    top: modal.y,
+                    left: modal.x,
+                    backgroundColor: "white",
+                    border: "1px solid black",
+                    padding: "10px",
+                    zIndex: 1000,
+                  }}
                     onClick={(e) => e.stopPropagation()}
                 >
                     <form onSubmit={handleCommentSubmit}>
@@ -150,7 +178,7 @@ const App = () => {
                             onChange={(e) => setNewComment(e.target.value)}
                             placeholder="Add your comment"></textarea>
                         <input type='submit' value={"Post"} />
-                        <button onClick={() => setShowModal(false)}>Close</button>
+                        <button onClick={closeModal}>Close</button>
                     </form>
 
                 </div>
@@ -161,8 +189,8 @@ const App = () => {
                 <div
                     style={{
                         position: 'absolute',
-                        top: selectedComment.position.y,
-                        left: selectedComment.position.x,
+                        top: selectedComment.y,
+                        left: selectedComment.x,
                         transform: 'translate(-50%, -50%)',
                         padding: '20px',
                         backgroundColor: 'white',
@@ -181,7 +209,7 @@ const App = () => {
                         ))
                     }
                     {
-                        giveReply && <form onSubmit={() => handleReplySubmit(selectedComment)}>
+                        selectedComment.giveReply && <form onSubmit={() => handleReplySubmit(selectedComment)}>
                             <label htmlFor="comment">Put your reply here: </label>
                             <textarea name="reply" id="reply" rows={5} value={newReply}
                                 onChange={(e) => setNewReply(e.target.value)}
@@ -189,7 +217,7 @@ const App = () => {
                             <input type='submit' value={"Post"} />
                         </form>
                     }
-                    {(selectedComment.completed || giveReply) || <button onClick={() => setGiveReply(true)}>Reply</button>}
+                    {(selectedComment.completed || selectedComment.giveReply) || <button onClick={() => activateReply(selectedComment)}>Reply</button>}
                     <button onClick={closeCommentPopup}>Close</button>
                     {selectedComment.completed || <button onClick={() => setCompleted(selectedComment)}>Complete</button>}
                 </div>
