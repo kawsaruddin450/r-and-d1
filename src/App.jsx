@@ -3,6 +3,7 @@ import image1 from '../public/images/image1.jpg';
 import image2 from '../public/images/image2.jpg';
 import image3 from '../public/images/image3.jpg';
 import image4 from '../public/images/image4.jpg';
+import './App.css';
 
 const App = () => {
     const [modal, setModal] = useState({
@@ -11,10 +12,11 @@ const App = () => {
         y: 0,
         xpath: "",
     });
+    const [selectedComment, setSelectedComent] = useState(null);
+    const [hoveredMarker, setHoveredMarker] = useState(null); // Track the hovered marker
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [newReply, setNewReply] = useState('');
-    const [selectedComment, setSelectedComment] = useState(null);
     const [giveFeedback, setGiveFeedback] = useState(false);
 
     // Function to generate XPath
@@ -103,18 +105,21 @@ const App = () => {
     const handleReplySubmit = (comment) => {
         comment.replies = [...comment.replies, { id: Date.now(), text: newReply }]
         setNewReply('');
-        closeCommentPopup();
         comment.giveReply = false;
     }
 
-    const handleMarkerClick = (comment) => {
-        setSelectedComment(comment);
+    //show popup when hovering in
+    const handleMouseEnter = (marker, comment) => {
+        setHoveredMarker(marker);
+        setSelectedComent(comment);
+    }
+
+    // Close popup when hovering out
+    const handleMouseOut = () => {
+        setHoveredMarker(null);
+        setSelectedComent(null);
     };
 
-
-    const closeCommentPopup = () => {
-        setSelectedComment(null);
-    };
 
     const setCompleted = (comment) => {
         comment.completed = true;
@@ -122,7 +127,7 @@ const App = () => {
 
     return (
         <div onClick={giveFeedback ? handleClick : null} style={{ height: '100vh', width: '100vw', cursor: 'pointer' }}>
-            <div>
+            <div className='container'>
                 <h1>Click anywhere to leave a comment!</h1>
                 <br /> <br />
                 <h2>This is a heading 2</h2>
@@ -130,10 +135,10 @@ const App = () => {
                 <h4>This is a heading 4</h4>
                 <h5>This is a heading 5</h5>
 
-                <img src={image1} width={500} alt="" />
-                <img src={image2} width={500} alt="" />
-                <img src={image3} width={500} alt="" />
-                <img src={image4} width={500} alt="" />
+                <img src={image1} width={350} alt="" />
+                <img src={image2} width={350} alt="" />
+                <img src={image3} width={350} alt="" />
+                <img src={image4} width={350} alt="" />
 
                 <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque laboriosam dicta quaerat quod totam excepturi nesciunt asperiores quis quas nam.</p>
                 <br />
@@ -165,33 +170,6 @@ const App = () => {
                 onClick={() => setGiveFeedback(!giveFeedback)}
             >{`${giveFeedback ? 'Deactivate' : 'Activate'}`}</button>
 
-            {/* Markers for each comment */}
-            {giveFeedback && comments.map((comment) => {
-                const position = getElementPosition(comment.xpath);
-                return (
-                    <div
-                        key={comment.id}
-                        style={{
-                            position: 'absolute',
-                            top: position.y,
-                            left: position.x,
-                            width: '20px',
-                            height: '20px',
-                            backgroundColor: `${comment.completed ? 'green' : 'red'}`,
-                            borderRadius: '50%',
-                            cursor: 'pointer',
-                            transform: 'translate(-50%, -50%)',
-                        }}
-                        onMouseEnter={(e) => {
-                            e.stopPropagation();
-                            handleMarkerClick(comment);
-                        }}
-                    ></div>
-                )
-            }
-
-            )}
-
             {/* Modal for adding a new comment */}
             {modal.isVisible && (
                 <div
@@ -218,13 +196,43 @@ const App = () => {
                 </div>
             )}
 
+            {/* Markers for each comment */}
+            {giveFeedback && comments.map((comment) => {
+                const position = getElementPosition(comment.xpath);
+                return (
+                    <div
+                        key={comment.id}
+                        style={{
+                            position: 'absolute',
+                            top: position.y,
+                            left: position.x,
+                            width: '20px',
+                            height: '20px',
+                            backgroundColor: `${comment.completed ? 'green' : 'red'}`,
+                            borderRadius: '50%',
+                            cursor: 'pointer',
+                            transform: 'translate(-50%, -50%)',
+                        }}
+                        onMouseEnter={() =>
+                            handleMouseEnter({
+                                x: position.x,
+                                y: position.y,
+                            }, comment)
+                        }
+                    ></div>
+                )
+            }
+
+            )}
+
+
             {/* Popup to show selected comment */}
-            {selectedComment && (
+            {hoveredMarker && (
                 <div
                     style={{
                         position: 'absolute',
-                        top: selectedComment.y,
-                        left: selectedComment.x,
+                        top: hoveredMarker.y,
+                        left: hoveredMarker.x,
                         transform: 'translate(-50%, -50%)',
                         padding: '20px',
                         backgroundColor: 'white',
@@ -252,7 +260,7 @@ const App = () => {
                         </form>
                     }
                     {(selectedComment.completed || selectedComment.giveReply) || <button onClick={() => activateReply(selectedComment)}>Reply</button>}
-                    <button onClick={closeCommentPopup}>Close</button>
+                    <button onClick={handleMouseOut}>Close</button>
                     {selectedComment.completed || <button onClick={() => setCompleted(selectedComment)}>Complete</button>}
                 </div>
             )}
