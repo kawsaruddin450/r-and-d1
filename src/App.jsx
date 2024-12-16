@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import image1 from '../public/images/image1.jpg';
 import image2 from '../public/images/image2.jpg';
 import image3 from '../public/images/image3.jpg';
@@ -18,6 +18,19 @@ const App = () => {
     const [newComment, setNewComment] = useState('');
     const [newReply, setNewReply] = useState('');
     const [giveFeedback, setGiveFeedback] = useState(false);
+    const [windowSize, setWindowSize] = useState({ width: window.innerWidth, height: window.innerHeight });
+
+    // Listen for window resize to update state and trigger rerender
+    useEffect(() => {
+        const handleResize = () => {
+            setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+        };
+
+        window.addEventListener("resize", handleResize);
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        };
+    }, []);
 
     // Function to generate XPath
     const getXPath = (element) => {
